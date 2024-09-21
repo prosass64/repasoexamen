@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Ingreso Bancario</title>
+    <script>
+        function realizarOperacion(tipo) {
+            const cantidad = document.getElementById('cantidad').value;
+
+            fetch('procesar.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ tipo: tipo, cantidad: cantidad })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('saldo').innerText = `Saldo actual: ${data.saldo}`;
+                document.getElementById('mensaje').innerText = data.mensaje;
+                document.getElementById('cantidad').value = ''; // Limpiar el campo de entrada
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Simulador de Ingreso Bancario</h1>
+    <div>
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" required>
+    </div>
+    <div>
+        <button onclick="realizarOperacion('ingreso')">Ingresar</button>
+        <button onclick="realizarOperacion('retiro')">Retirar</button>
+    </div>
+    <div id="mensaje"></div>
+    <div id="saldo">Saldo actual: 0</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Usuario</title>
+    <script>
+        function enviarFormulario(event) {
+            event.preventDefault(); // Evita que el formulario se envíe de forma tradicional
+
+            const nombre = document.getElementById('nombre').value;
+            const edad = document.getElementById('edad').value;
+            const correo = document.getElementById('correo').value;
+
+            const datos = new FormData();
+            datos.append('nombre', nombre);
+            datos.append('edad', edad);
+            datos.append('correo', correo);
+
+            fetch('procesar.php', {
+                method: 'POST',
+                body: datos
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('mensaje').innerHTML = data; // Muestra el mensaje en el HTML
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Ingresa tus datos</h1>
+    <form onsubmit="enviarFormulario(event)">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+        
+        <label for="edad">Edad:</label>
+        <input type="number" id="edad" name="edad" required><br><br>
+        
+        <label for="correo">Correo electrónico:</label>
+        <input type="email" id="correo" name="correo" required><br><br>
+        
+        <input type="submit" value="Enviar">
+    </form>
+
+    <div id="mensaje"></div> <!-- Aquí se mostrará el mensaje -->
+</body>
+</html>

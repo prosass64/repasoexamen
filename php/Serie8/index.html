@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablas de Multiplicar</title>
+</head>
+<body>
+    <h1>Tablas de Multiplicar del 1 al 12</h1>
+    <div id="tabla-container"></div>
+    
+    <br>
+    <a href="descargar_csv.php" class="btn">Descargar como CSV</a>
+
+    <script>
+        // Cargar la tabla de multiplicar desde el archivo PHP
+        fetch('tablas.php')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('tabla-container').innerHTML = data;
+            })
+            .catch(error => console.error('Error al cargar la tabla:', error));
+    </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Ahorcado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #word {
+            font-size: 2em;
+            letter-spacing: 10px;
+        }
+        #guesses {
+            margin-top: 20px;
+        }
+        #message {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        #hangman {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .hidden {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+        input[type="text"] {
+            font-size: 1.2em;
+            padding: 5px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            width: 50px;
+        }
+        button {
+            padding: 10px;
+            font-size: 1.2em;
+        }
+        .hangman-part {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Juego de Ahorcado</h1>
+    <div id="word">_ _ _ _ _</div>
+    
+    <div id="guesses">
+        <p>Ingresa una letra:</p>
+        <input type="text" id="letterInput" maxlength="1">
+        <button id="guessBtn">Adivinar</button>
+    </div>
+
+    <div id="message"></div>
+    
+    <div id="hangman">
+        <p>Ahorcado:</p>
+        <p class="hangman-part" id="head">Cabeza</p>
+        <p class="hangman-part" id="body">Cuerpo</p>
+        <p class="hangman-part" id="left-arm">Brazo Izquierdo</p>
+        <p class="hangman-part" id="right-arm">Brazo Derecho</p>
+        <p class="hangman-part" id="left-leg">Pierna Izquierda</p>
+        <p class="hangman-part" id="right-leg">Pierna Derecha</p>
+    </div>
+
+    <script>
+        // Palabras predefinidas
+        const words = ['JAVASCRIPT', 'PROGRAMACION', 'AHORCADO', 'DOMINIO', 'CASCADA'];
+        let selectedWord = words[Math.floor(Math.random() * words.length)];
+        let guessedWord = Array(selectedWord.length).fill('_');
+        let attempts = 0;
+        const maxAttempts = 6;
+
+        // Elementos del DOM
+        const wordDisplay = document.getElementById('word');
+        const letterInput = document.getElementById('letterInput');
+        const messageDisplay = document.getElementById('message');
+        const guessBtn = document.getElementById('guessBtn');
+        const hangmanParts = document.querySelectorAll('.hangman-part');
+
+        // Mostrar la palabra con guiones bajos
+        wordDisplay.textContent = guessedWord.join(' ');
+
+        guessBtn.addEventListener('click', () => {
+            const letter = letterInput.value.toUpperCase();
+            if (letter && /^[A-Z]$/.test(letter)) {
+                processGuess(letter);
+            }
+            letterInput.value = '';
+        });
+
+        function processGuess(letter) {
+            if (selectedWord.includes(letter)) {
+                // La letra es correcta
+                for (let i = 0; i < selectedWord.length; i++) {
+                    if (selectedWord[i] === letter) {
+                        guessedWord[i] = letter;
+                    }
+                }
+                wordDisplay.textContent = guessedWord.join(' ');
+                messageDisplay.textContent = '¡Bien hecho!';
+                
+                if (!guessedWord.includes('_')) {
+                    messageDisplay.textContent = '¡Felicidades, has ganado!';
+                    endGame(true);
+                }
+            } else {
+                // La letra es incorrecta
+                attempts++;
+                showHangmanPart(attempts);
+                messageDisplay.textContent = `¡Letra incorrecta! Intentos restantes: ${maxAttempts - attempts}`;
+                
+                if (attempts === maxAttempts) {
+                    messageDisplay.textContent = `¡Has perdido! La palabra era: ${selectedWord}`;
+                    endGame(false);
+                }
+            }
+        }
+
+        function showHangmanPart(attempt) {
+            if (attempt <= hangmanParts.length) {
+                hangmanParts[attempt - 1].style.display = 'block';
+            }
+        }
+
+        function endGame(won) {
+            letterInput.disabled = true;
+            guessBtn.disabled = true;
+            if (!won) {
+                wordDisplay.textContent = selectedWord.split('').join(' ');
+            }
+        }
+    </script>
+
+</body>
+</html>

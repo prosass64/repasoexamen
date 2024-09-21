@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búsqueda de Películas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        .movies {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .movie {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 10px;
+            padding: 10px;
+            width: 200px;
+            text-align: center;
+        }
+        .movie img {
+            width: 100%;
+            height: auto;
+        }
+        .pagination {
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Buscar Películas</h1>
+    <input type="text" id="searchQuery" placeholder="Ingresa el título de la película">
+    <button id="searchBtn">Buscar</button>
+
+    <div class="movies" id="movies"></div>
+
+    <div class="pagination" id="pagination">
+        <button id="prevBtn" disabled>Anterior</button>
+        <button id="nextBtn" disabled>Siguiente</button>
+    </div>
+
+    <script>
+        const apiKey = 'e33fca00'; // Reemplaza con tu propia API Key de OMDb
+        let currentPage = 1;
+        let currentSearch = '';
+
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const query = document.getElementById('searchQuery').value.trim();
+            if (query) {
+                currentSearch = query;
+                currentPage = 1;
+                searchMovies(query, currentPage);
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                searchMovies(currentSearch, currentPage);
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            currentPage++;
+            searchMovies(currentSearch, currentPage);
+        });
+
+        function searchMovies(query, page) {
+            const url = `https://www.omdbapi.com/?s=${query}&page=${page}&apikey=${apiKey}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.Response === "True") {
+                        displayMovies(data.Search);
+                        handlePagination(data.totalResults);
+                    } else {
+                        document.getElementById('movies').innerHTML = '<p>No se encontraron resultados.</p>';
+                        document.getElementById('pagination').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function displayMovies(movies) {
+            const movieContainer = document.getElementById('movies');
+            movieContainer.innerHTML = ''; // Limpiar resultados anteriores
+
+            movies.forEach(movie => {
+                const movieDiv = document.createElement('div');
+                movieDiv.classList.add('movie');
+                movieDiv.innerHTML = `
+                    <img src="${movie.Poster !== "N/A" ? movie.Poster : 'https://via.placeholder.com/200'}" alt="${movie.Title}">
+                    <h3>${movie.Title}</h3>
+                    <p>Año: ${movie.Year}</p>
+                `;
+                movieContainer.appendChild(movieDiv);
+            });
+        }
+
+        function handlePagination(totalResults) {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const resultsPerPage = 10; // OMDb API trae 10 resultados por página
+
+            if (currentPage > 1) {
+                prevBtn.disabled = false;
+            } else {
+                prevBtn.disabled = true;
+            }
+
+            const totalPages = Math.ceil(totalResults / resultsPerPage);
+            if (currentPage < totalPages) {
+                nextBtn.disabled = false;
+            } else {
+                nextBtn.disabled = true;
+            }
+        }
+    </script>
+
+</body>
+</html>
